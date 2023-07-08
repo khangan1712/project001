@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User</title>
+</head>
+
+<body onload="renderUser()">
+  <h2>Infor User</h2>
+  <div class="form">
+    <div class="form-group">
+      <label for="name">Name:</label>
+      <input id="name" type="text" class="name-form-input">
+      <div class="error-message"></div>
+    </div>
+    <br>
+
+    <div class="form-group">
+      <label for="address">Address:</label>
+      <input id="address" type="text" class="form-input">
+      <div class="error-message"></div>
+    </div>
+    <br>
+
+    <div class="form-group">
+      <label for="userName">UserName:</label>
+      <input id="userName" type="text" class="form-input">
+      <div class="error-message"></div>
+    </div>
+    <br>
+    <div class="form-group">
+      <input id="index" type="hidden" class="form-input">
+
+    </div>
+
+
+    <button id="save" onclick="addNew()">Add New</button>
+    <button id="update" onclick="changeUser()" style="display: none;">update</button>
+  </div>
+  <table border="1" cellspacing="0" cellpading="10" id="tableContent">
+
+
+  </table>
+
+  <script>
+    function resetInput() {
+      document.getElementById("name").value = ""
+      document.getElementById("address").value = ""
+      document.getElementById("userName").value = ""
+
+    }
+    // kiem tra nguoi dung nhap du lieu chua
+    function validateInput() {
+      let formElement = document.querySelector(".form");
+      let inputElement = document.querySelectorAll(".name-form-input")
+      for (let i = 0;i < inputElement.length;i++) {
+        if (inputElement[i].value === "") {
+          inputElement[i].parentElement.querySelector(".error-message").innerText = `please enter your  ${inputElement[i].id}`
+        }
+        else {
+          inputElement[i].parentElement.querySelector(".error-message").innerText = ""
+        }
+      }
+    }
+
+
+    // sau khi nhap du lieu roi thi luu du lieu
+    function addNew() {
+      validateInput()
+      let formElement = document.querySelector(".form")
+      let errorElement = formElement.querySelectorAll(".error-message")
+      let arrErrorElement = []
+
+      for (let i = 0;i < errorElement.length;i++) {
+        arrErrorElement.push(errorElement[i].innerText)
+
+      }
+      let checkErrorElement = arrErrorElement.every(value => value === "")
+      if (checkErrorElement) {
+        // luu du lieu
+        let name = document.getElementById("name").value
+        let address = document.getElementById("address").value
+        let userName = document.getElementById("userName").value
+
+        let listUser = localStorage.getItem("listUser") ? JSON.parse(localStorage.getItem("listUser")) : []
+        listUser.push({
+          name: name,
+          address: address,
+          userName: userName
+        })
+        localStorage.setItem("listUser", JSON.stringify(listUser))
+      }
+      renderUser()
+      resetInput()
+
+    }
+
+    // luu xong thi dua du lieu ra ngoai man hinh vao bang
+    function renderUser() {
+      let listUser = localStorage.getItem("listUser") ? JSON.parse(localStorage.getItem("listUser")) : []
+      let User = ` <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Adress</th>
+        <th>Username</th>
+        <th>Action</th>
+      </tr> `
+      listUser.map((value, index) => {
+        User += ` <tr>
+          <td>${index + 1}</td>
+          <td>${value.name}</td>
+          <td>${value.address}</td>
+          <td>${value.userName}</td>
+          <td>
+           <button onclick="editUser(${index})">Edit</button>
+           <button  onclick="deleteUser(${index})">Delete</button>
+            </td>
+      </tr> `
+
+
+      })
+      document.getElementById("tableContent").innerHTML = User
+
+
+
+    }
+
+    function editUser(index) {
+      let listUser = localStorage.getItem("listUser") ? JSON.parse(localStorage.getItem("listUser")) : []
+      document.getElementById("name").value = listUser[index].name
+      document.getElementById("address").value = listUser[index].address
+      document.getElementById("userName").value = listUser[index].userName
+
+      document.getElementById("index").value = index
+
+
+      document.getElementById("save").style.display = "none"
+      document.getElementById("update").style.display = "inline-block"
+
+
+    }
+    function changeUser() {
+      let listUser = localStorage.getItem("listUser") ? JSON.parse(localStorage.getItem("listUser")) : []
+      let index = document.getElementById("index").value
+      listUser[index] = {
+        name: document.getElementById("name").value,
+        address: document.getElementById("address").value,
+        userName: document.getElementById("userName").value
+      }
+      localStorage.setItem("listUser", JSON.stringify(listUser))
+
+      document.getElementById("save").style.display = "inline-block"
+      document.getElementById("update").style.display = "none"
+      renderUser()
+      resetInput()
+
+    }
+
+    function deleteUser() {
+      let listUser = localStorage.getItem("listUser") ? JSON.parse(localStorage.getItem("listUser")) : []
+      listUser.splice(index, 1)
+      localStorage.setItem("listUser", JSON.stringify(listUser))
+      renderUser()
+
+    }
+
+  </script>
+</body>
+
+</html>
